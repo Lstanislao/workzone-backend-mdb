@@ -37,8 +37,11 @@ const UsuarioSchema =  Schema({
   fechaNacimiento: {
     type: Date,
     required: true,
-  }
-
+  },
+  LiderProyecto: [{ 
+    type : Schema.Types.ObjectId, 
+    ref: 'proyecto' 
+  }],
 });
 
 //Esto es para que no devuelva la contrasena 

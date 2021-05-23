@@ -9,7 +9,7 @@ const createUsuario = async (req, res = response) => {
   try {
 
     const { email, contrasena, username } =  req.body;
-    console.log(req.body)
+    console.log(req.body);
     
     //validar que el correo ni el username ya esten registrados
     const userValidation = await Usuario.findOne({
@@ -62,7 +62,10 @@ const createUsuario = async (req, res = response) => {
 }
 
 
-
+/**
+ * @description:al hacer login, se busca correo y se verifica que la contrasena sean iguales
+ * @param: email, contrasena
+ */
 const login = async (req, res = response) => {
   try {
 
@@ -106,7 +109,10 @@ const login = async (req, res = response) => {
   }
 }
 
-
+/**
+ * @description: Renueva el token de la sesion
+ * @param: uid , userID
+ */
 const renewToken = async (req, res = response) => {
     const uid = req.uid;
 
@@ -123,15 +129,25 @@ const renewToken = async (req, res = response) => {
  
     })
     
-
-
 } 
 
+/**
+ * @description: devuelve un usuario dado el email
+ * @param: email
+ * No es una peticion de utiliza internamente en el servidor
+ */
+const getUsuarioByEmail = async (email) => {
 
+    const user = await Usuario.findOne({email : email })
+    console.log(user);
+    return user;
+    
+} 
 
 
 module.exports =  {
   createUsuario,
   login,
-  renewToken
+  renewToken,
+  getUsuarioByEmail
 }

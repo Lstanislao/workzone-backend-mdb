@@ -39,7 +39,8 @@ class Server {
         this.app.use( express.json() )
 
         //Rutas
-        this.app.use('/api/auth', require('../router/auth'))
+        this.app.use('/api/auth', require('../router/authRoutes'));
+        this.app.use('/api/projects', require('../router/proyectoRoutes'));
     
     }
 

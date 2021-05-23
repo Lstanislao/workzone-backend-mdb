@@ -1,5 +1,5 @@
 /**
- * path api/login
+ * path api/auth
  */
 
 const { Router } = require('express');
@@ -10,8 +10,7 @@ const { validarJWT } = require('../middlewares/validarJwt');
 const router =  Router();
 
 //create user
-router.post('/createUsuario', createUsuario)
-
+router.post('/createUsuario', createUsuario);
 
 //login el check es por si se quiere validar pero creo que lo haremos desde el front
 router.post('/login',[
