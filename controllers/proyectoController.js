@@ -89,20 +89,30 @@ const updateProyecto = async (req, res = response) => {
 }
 
 /**
- * NO SE SI SIRVE , no se hacer get desde post man JAJAJAJ lo iba a porbar y se hizo la hora de comer
- * @description: Busca todos los proyectos activos en los que participa el usuario con su 
- * numero de miembros
+ * 
+ * @description: Busca todos los proyectos activos en los que participa el usuario ordenados desc 
+ * 
  * @param: id del usuario
  */
 const getProyectosUsuario = async (req, res = response) => {
   try {
+    console.log(req.params.user)
     console.log(req.body)
-    const { uid } = req.body;
+    const  uid  = req.params.user;
 
     const proyectos = await Proyecto.find(
-      { miembros: { $elemMatch: { uid } } }
-    )
+      { miembros: { $in: [uid]}, active: true  }
+    ).sort( { createdAt: -1} )
+    
+    // await Proyecto.aggregate([
+    //   { $match: { miembros: { $in: [uid] } } },
+    //   { $sort: { createdAt: -1 }},
+    //   { $addFields: { numMiembros: { $size: "$miembros" } }}
+    // ])
 
+    
+
+    
     console.log(proyectos)
 
   res.json({
