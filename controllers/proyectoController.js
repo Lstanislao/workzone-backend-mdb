@@ -6,7 +6,7 @@ const { getUsuarioByEmail } = require('../controllers/authController');
 
 /**
  * @description: crea un nuevo proyecto , se crea por default activo y no archivado
- * @param nombre, descripcion, miembros
+ * @param: nombre, descripcion, miembros
  */
 const createProyecto = async (req, res = response) => {
   try {
@@ -57,6 +57,11 @@ const createProyecto = async (req, res = response) => {
   }
 }
 
+/**
+ * @description: Actualiza un proyecto. Sirve tanto para los campos que el usuario cambie como
+ * para archivar y eliminar logicamente
+ * @param: id proyecto y el o los atributos a cambiar (nombre, descripcion, id plan elegido, si esta archivado, si esta activo, etc)
+ */
 const updateProyecto = async (req, res = response) => {
   try {
    
@@ -122,6 +127,12 @@ const getProyecto = async (req, res = response) => {
   }
 }
 
+/**
+ * 
+ * @description: Busca un los proyectos activos de un usuario 
+ * 
+ * @param: id del usuario
+ */
 const getProyectosUsuario = async (req, res = response) => {
   try {
     console.log(req.params.user)
@@ -131,20 +142,6 @@ const getProyectosUsuario = async (req, res = response) => {
     const proyectos = await Proyecto.find(
         { miembros: { $in: [uid]}, active: true  }
       ).sort( { createdAt: -1} )
-    
-    // await Proyecto.aggregate()
-    // .match({ miembros: { $in: [uid] }, active: true })
-    // .addFields({ numMiembros: { $size: "$miembros" } })
-    // .sort({ createdAt: -1});
-    
-    // await Proyecto.aggregate([
-    //   { $match: { miembros: { $in: [uid] } } },
-    //   { $sort: { createdAt: -1 }},
-    //   { $addFields: { numMiembros: { $size: "$miembros" } }}
-    // ])
-
-    
-
     
     console.log(proyectos)
 

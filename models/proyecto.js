@@ -32,6 +32,10 @@ const ProyectoSchema =  Schema({
     type : Schema.Types.ObjectId, 
     ref: 'Usuario' 
   }],
+  etiquetas: [{ 
+    type : String, 
+    default: [] 
+  }],
   active: {
     type: Boolean,
     default: true
