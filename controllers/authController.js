@@ -22,12 +22,12 @@ const createUsuario = async (req, res = response) => {
     if( userValidation?.email  === email ){
       return res.status(400).json({
         ok: false,
-        msg: "El correo ya existe"
+        msg: "El correo usado ya se encuentra registrado"
       })
     }else if( userValidation?.username  === username){
       return res.status(400).json({
         ok: false,
-        msg: "El username ya existe"
+        msg: "El username usado ya se encuentra registrado. Se más creativo e inventate uno mejor!"
       })
     }
 
@@ -47,7 +47,7 @@ const createUsuario = async (req, res = response) => {
     //lo que devuelve si se guarda
     res.json({
       ok: true,
-      usuario,
+      data: usuario,
       //token
     })
 
@@ -95,9 +95,19 @@ const login = async (req, res = response) => {
 
     res.json({
       ok: true,
-      usuario: usuarioDB,
+      data: usuarioDB,
       //token: token 
     });
+
+    Usuario.findByIdAndUpdate(usuarioDB._id ,{onLine : true},
+      function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            console.log("online usuario", docs);
+        }
+      });
 
     
   } catch (error) {
@@ -108,6 +118,44 @@ const login = async (req, res = response) => {
     })
   }
 }
+
+/**
+ * 
+ * @description actualiza los datos de un usuario
+ * @param mandale el uid y los datos que deseas actualizar del user
+ */
+const updateUsuario = async (req, res = response) => {
+  try {
+    console.log(req.body)
+   
+    const { uid } =  req.body;
+
+    const usuario =  new Usuario(
+      Usuario.findByIdAndUpdate(uid ,{...req.body},
+      function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            console.log("Actualizado el usuario", docs);
+        }
+      }));
+
+  res.json({
+      ok: true,
+      data: usuario,
+      
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'La peticion de actualizar'
+    })
+  }
+}
+
 
 /**
  * @description: Renueva el token de la sesion
@@ -125,7 +173,7 @@ const renewToken = async (req, res = response) => {
     res.json({
       ok: true,
       //token,
-      usuario
+      data: usuario
  
     })
     
@@ -149,5 +197,6 @@ module.exports =  {
   createUsuario,
   login,
   renewToken,
-  getUsuarioByEmail
+  getUsuarioByEmail,
+  updateUsuario
 }

@@ -107,7 +107,7 @@ const getProyecto = async (req, res = response) => {
     const  uid  = req.params.proyecto;
 
     const proyecto = await Proyecto.findById(uid)
-      .populate('plan')
+      .populate('id_plan')
       .populate('miembros');
     
     console.log(proyecto)

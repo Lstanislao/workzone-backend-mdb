@@ -4,13 +4,13 @@
 
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { createUsuario, login, renewToken } = require('../controllers/authController');
+const { createUsuario, login, renewToken, updateUsuario } = require('../controllers/authController');
 const { validarCampos } = require('../middlewares/validarCampos');
 const { validarJWT } = require('../middlewares/validarJwt');
 const router =  Router();
 
 //create user
-router.post('/createUsuario', createUsuario);
+router.post('/create', createUsuario);
 
 //login el check es por si se quiere validar pero creo que lo haremos desde el front
 router.post('/login',[
@@ -19,7 +19,11 @@ router.post('/login',[
 ],login);
 
 //Renovar token
-router.get('/renew', validarJWT ,renewToken)
+router.get('/renew', validarJWT ,renewToken);
+
+//update usuario
+router.post('/update', updateUsuario);
+
 
 
 

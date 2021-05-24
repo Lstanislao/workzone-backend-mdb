@@ -12,7 +12,7 @@ const ProyectoSchema =  Schema({
     type: String,
     require: true
   },
-  plan: {
+  id_plan: {
     type : Schema.Types.ObjectId, 
     ref: 'Plan' 
   },
