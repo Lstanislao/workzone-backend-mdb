@@ -33,5 +33,5 @@ PlanSchema.method('toJSON', function() {
 
 //Esto hace que se cree la coleccion en la base de datos 
 //@params nombre de la coleccion, estructura que va a tener
-// no hay que poner el nombre de la collec en plural el lo hace
+
 module.exports = model('Plan', PlanSchema);

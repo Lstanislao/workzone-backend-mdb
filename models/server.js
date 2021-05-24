@@ -42,6 +42,7 @@ class Server {
         this.app.use('/api/auth', require('../router/authRoutes'));
         this.app.use('/api/projects', require('../router/proyectoRoutes'));
         this.app.use('/api/tasks', require('../router/tareaRoutes'));
+        this.app.use('/api/plans', require('../router/planRoutes'));
     
     }
 
