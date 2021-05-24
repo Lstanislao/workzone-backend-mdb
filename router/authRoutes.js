@@ -10,7 +10,7 @@ const { validarJWT } = require('../middlewares/validarJwt');
 const router =  Router();
 
 //create user
-router.post('/createUsuario', createUsuario);
+router.post('/create', createUsuario);
 
 //login el check es por si se quiere validar pero creo que lo haremos desde el front
 router.post('/login',[
