@@ -1,6 +1,7 @@
 const { response } = require("express");
 const Proyecto = require("../models/proyecto");
 const Usuario = require("../models/usuario");
+const Plan = require("../models/plan");
 const { getUsuarioByEmail } = require('../controllers/authController'); 
 
 /**
@@ -26,16 +27,16 @@ const createProyecto = async (req, res = response) => {
      * ademas si se piden todos los correos es decir todos los usuarios ya podriamos mandar los id no se que te parece 
      */
 
-    const correos =  req.body.miembros
-    const miembrosIds = await Promise.all 
-      (correos.map( async (email) => {
+    // const correos =  req.body.miembros
+    // const miembrosIds = await Promise.all 
+    //   (correos.map( async (email) => {
       
-      const user = await getUsuarioByEmail(email);
+    //   const user = await getUsuarioByEmail(email);
       
-      return user.id
-    }))
+    //   return user.id
+    // }))
 
-    req.body.miembros =  miembrosIds;
+    // req.body.miembros =  miembrosIds;
     
     const proyecto = new Proyecto(req.body);
 
@@ -43,7 +44,7 @@ const createProyecto = async (req, res = response) => {
 
     res.json({
       ok: true,
-      proyecto: proyecto,
+      data: proyecto,
       
     });
 
@@ -75,7 +76,7 @@ const updateProyecto = async (req, res = response) => {
 
   res.json({
       ok: true,
-      proyecto: proyecto,
+      data: proyecto,
       
     });
 
@@ -83,17 +84,44 @@ const updateProyecto = async (req, res = response) => {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: 'La peticion de crear proyecto fallo'
+      msg: 'La peticion de actualizar proyecto fallo'
     })
   }
 }
 
 /**
  * 
- * @description: Busca todos los proyectos activos en los que participa el usuario ordenados desc 
+ * @description: Busca un proyecto con su respectivo plan y miembros 
  * 
- * @param: id del usuario
+ * @param: id del proyecto
  */
+const getProyecto = async (req, res = response) => {
+  try {
+    console.log(req.params.proyecto)
+    console.log(req.body)
+    const  uid  = req.params.proyecto;
+
+    const proyecto = await Proyecto.findById(uid)
+      .populate('plan')
+      .populate('miembros');
+    
+    console.log(proyecto)
+
+  res.json({
+      ok: true,
+      data: proyecto,
+      
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'La peticion de buscar proyecto fallo'
+    })
+  }
+}
+
 const getProyectosUsuario = async (req, res = response) => {
   try {
     console.log(req.params.user)
@@ -101,8 +129,13 @@ const getProyectosUsuario = async (req, res = response) => {
     const  uid  = req.params.user;
 
     const proyectos = await Proyecto.find(
-      { miembros: { $in: [uid]}, active: true  }
-    ).sort( { createdAt: -1} )
+        { miembros: { $in: [uid]}, active: true  }
+      ).sort( { createdAt: -1} )
+    
+    // await Proyecto.aggregate()
+    // .match({ miembros: { $in: [uid] }, active: true })
+    // .addFields({ numMiembros: { $size: "$miembros" } })
+    // .sort({ createdAt: -1});
     
     // await Proyecto.aggregate([
     //   { $match: { miembros: { $in: [uid] } } },
@@ -117,7 +150,7 @@ const getProyectosUsuario = async (req, res = response) => {
 
   res.json({
       ok: true,
-      proyectos: proyectos,
+      data: proyectos,
       
     });
 
@@ -125,7 +158,7 @@ const getProyectosUsuario = async (req, res = response) => {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: 'La peticion de crear proyecto fallo'
+      msg: 'La peticion de buscar proyectos fallo'
     })
   }
 }
@@ -134,5 +167,6 @@ const getProyectosUsuario = async (req, res = response) => {
 module.exports = {
   createProyecto,
   updateProyecto,
-  getProyectosUsuario
+  getProyectosUsuario,
+  getProyecto
 }

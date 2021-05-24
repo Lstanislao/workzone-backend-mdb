@@ -12,11 +12,23 @@ const ProyectoSchema =  Schema({
     type: String,
     require: true
   },
+  plan: {
+    type : Schema.Types.ObjectId, 
+    ref: 'Plan' 
+  },
+  owner: { 
+    type : Schema.Types.ObjectId, 
+    ref: 'Usuario' 
+  },
   archivado: {
     type: Boolean,
     default: false
   },
   miembros: [{ 
+    type : Schema.Types.ObjectId, 
+    ref: 'Usuario' 
+  }],
+  lideres: [{ 
     type : Schema.Types.ObjectId, 
     ref: 'Usuario' 
   }],
