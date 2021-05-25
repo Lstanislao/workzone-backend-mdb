@@ -37,7 +37,7 @@ const UsuarioSchema =  Schema({
   fechaNacimiento: {
     type: Date,
     required: true,
-  },
+  }
 });
 
 //Esto es para que no devuelva la contrasena 

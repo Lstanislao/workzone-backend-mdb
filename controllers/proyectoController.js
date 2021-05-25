@@ -1,41 +1,16 @@
 const { response } = require("express");
 const Proyecto = require("../models/proyecto");
 const Usuario = require("../models/usuario");
+const Plan = require("../models/plan");
 const { getUsuarioByEmail } = require('../controllers/authController'); 
 
 /**
  * @description: crea un nuevo proyecto , se crea por default activo y no archivado
- * @param nombre, descripcion, miembros
+ * @param: nombre, descripcion, miembros
  */
 const createProyecto = async (req, res = response) => {
   try {
     console.log(req.body);
-    /**
-     * Testantemto de  luis a ori con amor AVISAME CUANDO LEAS ESTO PARA HABLAR SOBRE LOS ROLES
-     * 
-     * yo digo que en miembros vengan array de los correos y aqui se haga la peticion en base a esos correos
-     * de los id de esa gente para guardarlo en el array de mienbros que va a ir a la base de datos
-     * 
-     * mano  ni idea como validar si esos correos en nuestra bd
-     *  existen desde el front ahi se hara un peticion para validar
-     * 
-     * bueno luego de meditarlo creo que a penas entremos a la pantalla de crear proyecto
-     * se puede hacer la peticion de todos los correos de la bd y asi se verifica si los correos que el ingreso
-     * estan en lal bd idk porque de hecho esta peticion tarda burda
-     * 
-     * ademas si se piden todos los correos es decir todos los usuarios ya podriamos mandar los id no se que te parece 
-     */
-
-    const correos =  req.body.miembros
-    const miembrosIds = await Promise.all 
-      (correos.map( async (email) => {
-      
-      const user = await getUsuarioByEmail(email);
-      
-      return user.id
-    }))
-
-    req.body.miembros =  miembrosIds;
     
     const proyecto = new Proyecto(req.body);
 
@@ -43,7 +18,7 @@ const createProyecto = async (req, res = response) => {
 
     res.json({
       ok: true,
-      proyecto: proyecto,
+      data: proyecto,
       
     });
 
@@ -56,6 +31,11 @@ const createProyecto = async (req, res = response) => {
   }
 }
 
+/**
+ * @description: Actualiza un proyecto. Sirve tanto para los campos que el usuario cambie como
+ * para archivar y eliminar logicamente
+ * @param: id proyecto y el o los atributos a cambiar (nombre, descripcion, id plan elegido, si esta archivado, si esta activo, etc)
+ */
 const updateProyecto = async (req, res = response) => {
   try {
    
@@ -75,7 +55,7 @@ const updateProyecto = async (req, res = response) => {
 
   res.json({
       ok: true,
-      proyecto: proyecto,
+      data: proyecto,
       
     });
 
@@ -83,31 +63,32 @@ const updateProyecto = async (req, res = response) => {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: 'La peticion de crear proyecto fallo'
+      msg: 'La peticion de actualizar proyecto fallo'
     })
   }
 }
 
 /**
- * NO SE SI SIRVE , no se hacer get desde post man JAJAJAJ lo iba a porbar y se hizo la hora de comer
- * @description: Busca todos los proyectos activos en los que participa el usuario con su 
- * numero de miembros
- * @param: id del usuario
+ * 
+ * @description: Busca un proyecto con su respectivo plan y miembros 
+ * 
+ * @param: id del proyecto
  */
-const getProyectosUsuario = async (req, res = response) => {
+const getProyecto = async (req, res = response) => {
   try {
+    console.log(req.params.proyecto)
     console.log(req.body)
-    const { uid } = req.body;
+    const  uid  = req.params.proyecto;
 
-    const proyectos = await Proyecto.find(
-      { miembros: { $elemMatch: { uid } } }
-    )
-
-    console.log(proyectos)
+    const proyecto = await Proyecto.findById(uid)
+      .populate('id_plan')
+      .populate('miembros');
+    
+    console.log(proyecto)
 
   res.json({
       ok: true,
-      proyectos: proyectos,
+      data: proyecto,
       
     });
 
@@ -115,7 +96,40 @@ const getProyectosUsuario = async (req, res = response) => {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: 'La peticion de crear proyecto fallo'
+      msg: 'La peticion de buscar proyecto fallo'
+    })
+  }
+}
+
+/**
+ * 
+ * @description: Busca un los proyectos activos de un usuario 
+ * 
+ * @param: id del usuario
+ */
+const getProyectosUsuario = async (req, res = response) => {
+  try {
+    console.log(req.params.user)
+    console.log(req.body)
+    const  uid  = req.params.user;
+
+    const proyectos = await Proyecto.find(
+        { miembros: { $in: [uid]}, active: true  }
+      ).sort( { createdAt: -1} )
+    
+    console.log(proyectos)
+
+  res.json({
+      ok: true,
+      data: proyectos,
+      
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'La peticion de buscar proyectos fallo'
     })
   }
 }
@@ -124,5 +138,6 @@ const getProyectosUsuario = async (req, res = response) => {
 module.exports = {
   createProyecto,
   updateProyecto,
-  getProyectosUsuario
+  getProyectosUsuario,
+  getProyecto
 }
