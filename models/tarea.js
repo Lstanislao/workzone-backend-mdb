@@ -33,9 +33,9 @@ const TareaSchema =  Schema({
     type : Date,
     default: null
   },
-  status: { 
-    type : Number, 
-    require: true
+  lista: { 
+    type : Schema.Types.ObjectId, 
+    ref: 'Lista'
   },
   cronometro: {
     type: Number,
