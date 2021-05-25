@@ -47,7 +47,7 @@ const getListasProyecto = async (req, res = response) => {
           from: 'tareas',
           localField: '_id',
           foreignField: 'lista',
-          as: 'tareas'
+          as: 'items'
         }).exec()
     
     console.log(listas)
