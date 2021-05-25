@@ -4,9 +4,36 @@ const { Types} = require("mongoose");
 const Lista = require("../models/lista");
 
 /**
+ * @description: crea una nueva lista del tablero de un proyecto , se crea por default activo
+ * @param: nombre, id del proyecto
+ */
+ const createLista = async (req, res = response) => {
+  try {
+    console.log(req.body);
+    
+    const lista = new Lista(req.body);
+
+    lista.save();
+
+    res.json({
+      ok: true,
+      data: lista,
+      
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'La peticion de crear lista fallo'
+    })
+  }
+}
+
+/**
  * 
  * @description: Busca las listas activas de un proyecto
- *
+ * @param: id del proyecto
  */
 const getListasProyecto = async (req, res = response) => {
   try {
@@ -42,5 +69,6 @@ const getListasProyecto = async (req, res = response) => {
 
 
 module.exports = {
+  createLista,
   getListasProyecto
 }

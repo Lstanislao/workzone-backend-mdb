@@ -11,32 +11,6 @@ const { getUsuarioByEmail } = require('../controllers/authController');
 const createProyecto = async (req, res = response) => {
   try {
     console.log(req.body);
-    /**
-     * Testantemto de  luis a ori con amor AVISAME CUANDO LEAS ESTO PARA HABLAR SOBRE LOS ROLES
-     * 
-     * yo digo que en miembros vengan array de los correos y aqui se haga la peticion en base a esos correos
-     * de los id de esa gente para guardarlo en el array de mienbros que va a ir a la base de datos
-     * 
-     * mano  ni idea como validar si esos correos en nuestra bd
-     *  existen desde el front ahi se hara un peticion para validar
-     * 
-     * bueno luego de meditarlo creo que a penas entremos a la pantalla de crear proyecto
-     * se puede hacer la peticion de todos los correos de la bd y asi se verifica si los correos que el ingreso
-     * estan en lal bd idk porque de hecho esta peticion tarda burda
-     * 
-     * ademas si se piden todos los correos es decir todos los usuarios ya podriamos mandar los id no se que te parece 
-     */
-
-    // const correos =  req.body.miembros
-    // const miembrosIds = await Promise.all 
-    //   (correos.map( async (email) => {
-      
-    //   const user = await getUsuarioByEmail(email);
-      
-    //   return user.id
-    // }))
-
-    // req.body.miembros =  miembrosIds;
     
     const proyecto = new Proyecto(req.body);
 
