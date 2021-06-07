@@ -31,6 +31,42 @@ const Lista = require("../models/lista");
 }
 
 /**
+ * @description: Actualiza una lista. Sirve tanto para cambio de nombre, tareas y eliminar logicamente
+ * @param: id lista y el o los atributos a cambiar (nombre, tareas, si esta activo)
+ */
+ const updateLista = async (req, res = response) => {
+  try {
+   
+    const { id_lista } =  req.body;
+
+    const lista = new Lista(req.body);
+
+    Lista.findByIdAndUpdate(id_lista ,{...req.body},
+      function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            console.log("Actualizada la lista", docs);
+        }
+      })
+
+  res.json({
+      ok: true,
+      data: lista,
+      
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'La peticion de actualizar lista fallo'
+    })
+  }
+}
+
+/**
  * 
  * @description: Busca las listas activas de un proyecto
  * @param: id del proyecto
@@ -70,5 +106,6 @@ const getListasProyecto = async (req, res = response) => {
 
 module.exports = {
   createLista,
+  updateLista,
   getListasProyecto
 }
