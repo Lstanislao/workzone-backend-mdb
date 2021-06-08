@@ -191,6 +191,34 @@ const renewToken = async (req, res = response) => {
 };
 
 /**
+ * @description: devuelve un usuario dado el id
+ * @param: id usuario
+ */
+const getUsuario = async (req, res = response) => {
+  try {
+    console.log(req.params.user)
+    const  uid  = req.params.user;
+
+    const usuario = await Usuario.findById(uid);
+    
+    console.log(usuario);
+
+  res.json({
+      ok: true,
+      data: usuario,
+      
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'La peticion de buscar usuario fallo'
+    })
+  }
+}
+
+/**
  * @description: devuelve un usuario dado el email
  * @param: email
  * No es una peticion de utiliza internamente en el servidor
@@ -208,4 +236,5 @@ module.exports = {
   getUsuarioByEmail,
   updateUsuario,
   getUsuarios,
+  getUsuario
 };

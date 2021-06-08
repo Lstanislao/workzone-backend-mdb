@@ -10,6 +10,7 @@ const {
   renewToken,
   updateUsuario,
   getUsuarios,
+  getUsuario,
 } = require("../controllers/authController");
 const { validarCampos } = require("../middlewares/validarCampos");
 const { validarJWT } = require("../middlewares/validarJwt");
@@ -33,5 +34,6 @@ router.post("/update", updateUsuario);
 
 //get all usuarios
 router.get("/users", getUsuarios);
+router.get('/:user', getUsuario);
 
 module.exports = router;
