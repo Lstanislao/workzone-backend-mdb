@@ -2,6 +2,7 @@
 const { response } = require("express");
 const { Types} = require("mongoose");
 const Lista = require("../models/lista");
+const Tarea = require("../models/tarea");
 
 /**
  * @description: crea una nueva lista del tablero de un proyecto , se crea por default activo
@@ -77,15 +78,19 @@ const getListasProyecto = async (req, res = response) => {
     const  id  = Types.ObjectId(req.params.proyecto);
     console.log('pro' + id)
 
-    const listas = await Lista.aggregate()
-    .match({ id_proyecto: id }, { active: true })
-    .lookup({
-          from: 'tareas',
-          localField: '_id',
-          foreignField: 'lista',
-          as: 'items'
-        }).exec()
-    
+    // const listas = await Lista.aggregate()
+    // .match({ id_proyecto: id }, { active: true })
+    // .lookup({
+    //       from: 'tareas',
+    //       localField: '_id',
+    //       foreignField: 'lista',
+    //       as: 'items'
+    //     }).exec()
+
+    const listas = await Lista.find( 
+      { id_proyecto: id, active: true  })
+      .populate('items');
+
     console.log(listas)
 
   res.json({
