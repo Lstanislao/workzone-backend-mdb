@@ -3,6 +3,7 @@ const Usuario = require("../models/usuario");
 const bcrypt = require("bcryptjs");
 const { generarJWT } = require("../helpers/jwt");
 const usuario = require("../models/usuario");
+const nodemailer = require('nodemailer');
 
 /**
  * @description:crea usuario y valida si ese correo y username ya existe
@@ -193,13 +194,87 @@ const renewToken = async (req, res = response) => {
 /**
  * @description: devuelve un usuario dado el email
  * @param: email
- * No es una peticion de utiliza internamente en el servidor
+ * No es una peticion se utiliza internamente en el servidor
  */
 const getUsuarioByEmail = async (email) => {
   const user = await Usuario.findOne({ email: email });
   console.log(user);
   return user;
 };
+
+/**
+ * @description: manda correo con contrasena provisional por si el usuario la olvida
+ * @param: email
+ */
+const recuperarContrasena = async (req, res = response) => {
+ try {
+    const { email } = req.body;
+    console.log(req.body)
+    //buscar el usuario con ese correo
+    const usuarioDB = await Usuario.findOne({ email });
+
+    if (!usuarioDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Email no encontrado",
+      });
+    }
+    console.log(usuarioDB);
+
+    //datos para enviar el correo
+    let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    secure: true,
+    auth: {
+        user: 'workzonetrial@gmail.com',
+        pass: 'workzone123456'
+    }
+    });
+
+    //contrasena provisional
+    let contraseProvisional =  usuarioDB.username+ Math.floor(Math.random()*(999-100+1)+100);
+    
+    const salt = bcrypt.genSaltSync();
+    console.log(usuarioDB)
+    usuarioDB.contrasena = bcrypt.hashSync(contraseProvisional, salt);
+    console.log(usuarioDB)
+
+    //enviar correo con contra provisional
+    transporter.sendMail({
+    from: 'workzonetrial@gmail.com',
+    to: usuarioDB.email,
+    subject: "Recuperación de contraña Workzone",
+    html:`<h3>Estimado usuario,</h3><p style="font-size: 16px;">Su contraseña es: <strong>${contraseProvisional}</strong> . 
+    Por favor ingrese a su cuenta con esta contraseña provicional y cambie la contraseña</p>`
+    }).then(
+      res=>console.log('successfully sent that mail'))
+    .catch(
+      err=>console.log(err));   
+
+
+    usuario.findByIdAndUpdate(usuarioDB._id, { ...usuarioDB }, function (err, docs) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Actualizada la contrasena del usuario", docs);
+        }
+    })
+    
+    res.json({
+      ok: true,
+      data: usuarioDB,
+    });
+
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "La peticion de recuperar contraseña fallo",
+    });
+  }
+};
+
 
 module.exports = {
   createUsuario,
@@ -208,4 +283,57 @@ module.exports = {
   getUsuarioByEmail,
   updateUsuario,
   getUsuarios,
+  recuperarContrasena
 };
+
+
+// const getUsuarioByEmail = async (email) => {
+//   const user = await Usuario.findOne({ email: email });
+//   console.log(user);
+//   return user;
+// };
+
+// const recuperarContrasena = async (req, res = response) => {
+//  try {
+//     const { email, contrasena, username } = req.body;
+//     console.log(req.body)
+//     //buscar el usuario con ese correo
+//     const usuarioDB = await Usuario.findOne({ email });
+
+//     if (!usuarioDB) {
+//       return res.status(404).json({
+//         ok: false,
+//         msg: "Email no encontrado",
+//       });
+//     }
+//     console.log(usuarioDB);
+
+//     if(usuarioDB.username =  username){
+
+//       const salt = bcrypt.genSaltSync();
+//       console.log(usuarioDB)
+//       usuarioDB.contrasena = bcrypt.hashSync(contrasena, salt);
+//       console.log(usuarioDB)
+//       Usuario.findByIdAndUpdate(usuarioDB._id, { ...usuarioDB }, function (err, docs) {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           console.log("Actualizado el usuario", docs);
+//         }
+//       })
+//     }
+
+//     res.json({
+//       ok: true,
+//       data: usuarioDB,
+//     });
+
+
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       ok: false,
+//       msg: "La peticion de crear usuario fallo",
+//     });
+//   }
+// };
