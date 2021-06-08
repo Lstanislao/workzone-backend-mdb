@@ -9,6 +9,13 @@ const ListaSchema = Schema({
     type: String,
     require: true,
   },
+  items: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Tarea",
+      default: [],
+    },
+  ],
   active: {
     type: Boolean,
     default: true,
