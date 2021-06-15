@@ -42,13 +42,13 @@ const createUsuario = async (req, res = response) => {
     usuario.save();
 
     //generar jwt
-    //const token  = await generarJWT(usuario.id);
+    const token = await generarJWT(usuario.id);
 
     //lo que devuelve si se guarda
     res.json({
       ok: true,
       data: usuario,
-      //token
+      token,
     });
   } catch (error) {
     console.log(error);
@@ -109,12 +109,12 @@ const login = async (req, res = response) => {
     }
 
     //generar el jwt
-    //const token = await generarJWT(usuarioDB.id);
+    const token = await generarJWT(usuarioDB.id);
 
     res.json({
       ok: true,
       data: usuarioDB,
-      //token: token
+      token: token,
     });
 
     Usuario.findByIdAndUpdate(
@@ -179,14 +179,14 @@ const renewToken = async (req, res = response) => {
   const uid = req.uid;
 
   //Gnerar nuevo JWT
-  //const token = await generarJWT( uid );
+  const token = await generarJWT(uid);
 
   //obtener el usuario por uid
   const usuario = await Usuario.findById(uid);
 
   res.json({
     ok: true,
-    //token,
+    token,
     data: usuario,
   });
 };
