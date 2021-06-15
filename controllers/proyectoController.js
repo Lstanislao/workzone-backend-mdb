@@ -1,5 +1,6 @@
 const { response } = require("express");
 const Proyecto = require("../models/proyecto");
+const { Types} = require("mongoose");
 const Usuario = require("../models/usuario");
 const Plan = require("../models/plan");
 const { getUsuarioByEmail } = require("../controllers/authController");
@@ -98,7 +99,7 @@ const getProyecto = async (req, res = response) => {
 
 /**
  *
- * @description: Busca un los proyectos activos de un usuario
+ * @description: Busca los proyectos activos de un usuario con su respectivo numero de tareas
  *
  * @param: id del usuario
  */
@@ -106,13 +107,32 @@ const getProyectosUsuario = async (req, res = response) => {
   try {
     console.log(req.params.user);
     console.log(req.body);
-    const uid = req.params.user;
 
-    const proyectos = await Proyecto.find({
-      miembros: { $in: [uid] },
-      active: true,
-    }).sort({ createdAt: -1 });
+    const uid = Types.ObjectId(req.params.user);
 
+    // const proyectos = await Proyecto.find({
+    //   miembros: { $in: [uid] },
+    //   active: true,
+    // }).sort({ createdAt: -1 });
+
+    const proyectos = await Proyecto.aggregate()
+    .match( { miembros: { $in: [uid] } }, { active: true }, { 'tareas.active': true})
+    .lookup({
+      from: 'tareas',
+      localField: '_id',
+      foreignField: 'id_proyecto',
+      as: 'tareas'
+    })
+    .project({
+      _id: 1,
+      nombre: 1,
+      miembros: { $size: "$miembros" },
+      tareas: { $size: "$tareas" },
+      archivado: 1
+    })
+    .sort({ updatedAt: -1 })
+    .exec();
+    
     console.log(proyectos);
 
     res.json({
