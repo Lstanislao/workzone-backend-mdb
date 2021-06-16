@@ -130,7 +130,7 @@ const deleteTarea = async (req, res = response) => {
  */
 const getTarea = async (req, res = response) => {
   try {
-    const id_tarea = req.params.tarea;
+    const id = req.params.tarea;
 
     const tarea = await Tarea.findById(id).populate("miembro");
     res.json({
