@@ -38,8 +38,8 @@ const TareaSchema =  Schema({
     ref: 'Lista'
   },
   cronometro: {
-    type: Number,
-    default: 0
+    type: String,
+    default: "0:0:0:0"
   },
   miembro: { 
     type : Schema.Types.ObjectId, 
