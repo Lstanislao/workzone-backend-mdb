@@ -57,6 +57,10 @@ const TareaSchema =  Schema({
       type: String,
       default: []
   }],
+  running: {
+    type: Boolean,
+    default: false
+  },
   active: {
     type: Boolean,
     default: true

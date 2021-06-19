@@ -39,18 +39,22 @@ const updateTarea = async (req, res = response) => {
 
     const tarea = new Tarea(req.body);
 
-    Tarea.findByIdAndUpdate(id_tarea, { ...req.body }, function (err, docs) {
+    Tarea.findByIdAndUpdate(id_tarea, { ...req.body }, {new: true}, function (err, docs) {
       if (err) {
         console.log(err);
+        res.status(500).json({
+          ok: false,
+          msg: "La peticion de actualizar tarea fallo",
+        });
       } else {
         console.log("Actualizada la tarea", docs);
+        res.json({
+          ok: true,
+          data: docs,
+        });
       }
     });
 
-    res.json({
-      ok: true,
-      data: tarea,
-    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
