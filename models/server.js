@@ -1,73 +1,70 @@
 // Servidor de Express
-const express  = require('express');
-const http     = require('http');
-const socketio = require('socket.io');
-const path     = require('path');
-const cors     = require('cors');
+const express = require("express");
+const http = require("http");
+const socketio = require("socket.io");
+const path = require("path");
+const cors = require("cors");
 
-const Sockets  = require('./sockets');
-const { dbConnection } = require('../database/config');
+const Sockets = require("./sockets");
+const { dbConnection } = require("../database/config");
 
 /**
  * @description: aqui se crea el servidor y todo lo necesario para correrlo
  */
 class Server {
+  constructor() {
+    this.app = express();
+    this.port = process.env.PORT;
 
-    constructor() {
+    //Contectar a db
+    dbConnection();
 
-        this.app  = express();
-        this.port = process.env.PORT;
+    // Http server esto es parte de sockets
+    this.server = http.createServer(this.app);
 
-        //Contectar a db
-        dbConnection();
+    // Configuraciones de sockets
+    this.io = socketio(this.server, {
+      /* configuraciones */
+    });
+  }
 
-        // Http server esto es parte de sockets
-        this.server = http.createServer( this.app );
-        
-        // Configuraciones de sockets
-        this.io = socketio( this.server, { /* configuraciones */ } );
-    }
+  middlewares() {
+    // Desplegar el directorio público
+    this.app.use(express.static(path.resolve(__dirname, "../public")));
 
-    middlewares() {
-        // Desplegar el directorio público
-        this.app.use( express.static( path.resolve( __dirname, '../public' ) ) );
+    //cors
+    this.app.use(cors());
 
-        //cors
-        this.app.use( cors() );
+    //pasar todo lo que venga a json TODO hay que hacer si vamos a recibir archivos el otro format
+    this.app.use(express.json());
 
-        //pasar todo lo que venga a json TODO hay que hacer si vamos a recibir archivos el otro format
-        this.app.use( express.json() )
+    //Rutas
+    this.app.use("/api/auth", require("../router/authRoutes"));
+    this.app.use("/api/projects", require("../router/proyectoRoutes"));
+    this.app.use("/api/tasks", require("../router/tareaRoutes"));
+    this.app.use("/api/plans", require("../router/planRoutes"));
+    this.app.use("/api/lists", require("../router/listaRoutes"));
+    this.app.use("/api/messages", require("../router/mensajeRoutes"));
+  }
 
-        //Rutas
-        this.app.use('/api/auth', require('../router/authRoutes'));
-        this.app.use('/api/projects', require('../router/proyectoRoutes'));
-        this.app.use('/api/tasks', require('../router/tareaRoutes'));
-        this.app.use('/api/plans', require('../router/planRoutes'));
-        this.app.use('/api/lists', require('../router/listaRoutes'));
-    
-    }
+  // Esta configuración se puede tener aquí o como propieda de clase
+  // depende mucho de lo que necesites
+  configurarSockets() {
+    new Sockets(this.io);
+  }
 
-    // Esta configuración se puede tener aquí o como propieda de clase
-    // depende mucho de lo que necesites
-    configurarSockets() {
-        new Sockets( this.io );
-    }
+  execute() {
+    // Inicializar Middlewares
+    this.middlewares();
 
-    execute() {
+    // Inicializar sockets
+    this.configurarSockets();
 
-        // Inicializar Middlewares
-        this.middlewares();
-
-        // Inicializar sockets
-        this.configurarSockets();
-
-        // Inicializar Server
-        this.server.listen( this.port, () => {
-            console.log('Server corriendo en puerto:', this.port );
-        });
-    }
-
+    // Inicializar Server
+    this.server.listen(this.port, () => {
+      console.log("Server corriendo en puerto:", this.port);
+    });
+  }
 }
-
 
 module.exports = Server;

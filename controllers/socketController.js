@@ -1,5 +1,6 @@
 const Usuario = require("../models/usuario");
 const Proyecto = require("../models/proyecto");
+const Mensaje = require("../models/mensaje");
 
 /*
  * @descripcion actualiza el online de la base de datos cuando un usuario se conecta
@@ -63,9 +64,27 @@ const getProyectosIds = async (uid) => {
   return proyectos;
 };
 
+const saveMensaje = async (payload) => {
+  try {
+    const mensaje = new Mensaje(payload);
+    await mensaje.save();
+
+    console.log(mensaje);
+    const mensajeConUser = await Mensaje.findById(mensaje._id)
+      .populate("de")
+      .populate("para");
+
+    return mensajeConUser;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   conectarUsuario,
   desconectarUsuario,
   getUsuariosChat,
   getProyectosIds,
+  saveMensaje,
 };
