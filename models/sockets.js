@@ -46,7 +46,7 @@ class Sockets {
         console.log(payload.id_proyecto.toString());
         this.io
           .to(payload.id_proyecto.toString())
-          .emit("refresh", { chao: "chao" });
+          .emit("refresh", { id_proyecto: payload.id_proyecto.toString() });
       });
 
       socket.on("refresh-chat", async (payload) => {
