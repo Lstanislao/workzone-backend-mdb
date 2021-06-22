@@ -14,7 +14,8 @@ const getChat = async (req, res) => {
 
   const last30 = await Mensaje.find({ para: proyecto_id })
     .sort({ createdAt: "asc" })
-    .populate("de");
+    .populate("de")
+    .limit(30);
 
   res.json({
     ok: true,
