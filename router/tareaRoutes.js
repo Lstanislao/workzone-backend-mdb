@@ -9,6 +9,7 @@ const {
   createTarea,
   getTareasProyecto,
   deleteTarea,
+  getTareasPorMiembro,
 } = require("../controllers/tareaController");
 
 const router = Router();
@@ -16,6 +17,7 @@ const router = Router();
 router.post("/create", createTarea);
 router.post("/update", updateTarea);
 router.get("/from/:proyecto", getTareasProyecto);
+router.get("/from/:proyecto/by-member", getTareasPorMiembro);
 router.get("/:tarea", getTarea);
 router.post("/delete", deleteTarea);
 
