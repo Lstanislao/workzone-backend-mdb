@@ -39,22 +39,26 @@ const updateTarea = async (req, res = response) => {
 
     const tarea = new Tarea(req.body);
 
-    Tarea.findByIdAndUpdate(id_tarea, { ...req.body }, {new: true}, function (err, docs) {
-      if (err) {
-        console.log(err);
-        res.status(500).json({
-          ok: false,
-          msg: "La peticion de actualizar tarea fallo",
-        });
-      } else {
-        console.log("Actualizada la tarea", docs);
-        res.json({
-          ok: true,
-          data: docs,
-        });
+    Tarea.findByIdAndUpdate(
+      id_tarea,
+      { ...req.body },
+      { new: true },
+      function (err, docs) {
+        if (err) {
+          console.log(err);
+          res.status(500).json({
+            ok: false,
+            msg: "La peticion de actualizar tarea fallo",
+          });
+        } else {
+          console.log("Actualizada la tarea", docs);
+          res.json({
+            ok: true,
+            data: docs,
+          });
+        }
       }
-    });
-
+    );
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -89,6 +93,39 @@ const getTareasProyecto = async (req, res = response) => {
     res.status(500).json({
       ok: false,
       msg: "La peticion de buscar proyectos fallo",
+    });
+  }
+};
+
+/**
+ *
+ * @description: Busca las tareas activas de un usuario dentro de un proyecto
+ *
+ * @param: id del proyecto, id del usuario
+ */
+const getTareasUsuarioProyecto = async (req, res = response) => {
+  try {
+    console.log(req.params);
+    const id = req.params.proyecto;
+    const id_miembro = req.params.usuario;
+
+    const tareas = await Tarea.find({
+      id_proyecto: id,
+      active: true,
+      miembro: id_miembro,
+    });
+
+    console.log(tareas);
+
+    res.json({
+      ok: true,
+      data: tareas,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "La peticion de buscar tareas de un usuario dentro de un poryecto fallo",
     });
   }
 };
@@ -156,4 +193,5 @@ module.exports = {
   getTareasProyecto,
   getTarea,
   deleteTarea,
+  getTareasUsuarioProyecto,
 };
