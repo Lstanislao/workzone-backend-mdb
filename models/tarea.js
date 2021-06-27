@@ -43,7 +43,8 @@ const TareaSchema =  Schema({
   },
   miembro: { 
     type : Schema.Types.ObjectId, 
-    ref: 'Usuario' 
+    ref: 'Usuario',
+    default: null 
   },
   subtareas: [{ 
     type : SubtareaSchema,

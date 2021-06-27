@@ -1,5 +1,6 @@
 const { response } = require("express");
 const Tarea = require("../models/tarea");
+const { Types } = require("mongoose");
 const Lista = require("../models/lista");
 const Usuario = require("../models/usuario");
 
@@ -92,11 +93,79 @@ const getTareasProyecto = async (req, res = response) => {
     console.log(error);
     res.status(500).json({
       ok: false,
-      msg: "La peticion de buscar proyectos fallo",
+      msg: "La peticion de buscar tareas fallo",
     });
   }
 };
 
+/**
+ *
+ * @description: Busca las tareas activas de un proyecto y las agrupa por miembro, buscando el numero total,
+ * los tiempo de cada una y el nombre del miembro
+ *
+ * @param: id del proyecto
+ */
+const getTareasPorMiembro = async (req, res = response) => {
+  try {
+    const id = Types.ObjectId(req.params.proyecto);
+
+    const tareas = await Tarea.aggregate()
+      .match({ id_proyecto: id }, { active: true })
+      .group({
+        _id: "$miembro",
+        tareas: { $sum: 1 },
+        tiempo: { $push: "$cronometro" },
+      })
+      .lookup({
+        from: "usuarios",
+        localField: "_id",
+        foreignField: "_id",
+        as: "miembro",
+      })
+      .project({
+        _id: 1,
+        tareas: 1,
+        tiempo: 1,
+        miembro: {
+          nombre: 1,
+          apellido: 1,
+        },
+      });
+
+    console.log(tareas);
+
+    res.json({
+      ok: true,
+      data: tareas,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "La peticion de buscar tareas fallo",
+    });
+  }
+
+  /*
+  db.tareas.aggregate( [
+    {
+      $group: {
+        _id: "$miembro", 
+        tareas: { $sum: 1 }, 
+        tiempo: { $push: "$cronometro" }
+      }
+    }, 
+    {
+      $lookup: {
+      from: 'usuarios',
+      localField: '_id',
+      foreignField: '_id',
+      as: 'miembro'
+    }
+    }
+  ])
+  */
+};
 /**
  *
  * @description: Busca las tareas activas de un usuario dentro de un proyecto
@@ -191,6 +260,7 @@ module.exports = {
   createTarea,
   updateTarea,
   getTareasProyecto,
+  getTareasPorMiembro,
   getTarea,
   deleteTarea,
   getTareasUsuarioProyecto,
