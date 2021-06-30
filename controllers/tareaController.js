@@ -70,6 +70,44 @@ const updateTarea = async (req, res = response) => {
 };
 
 /**
+ * @description: Actualiza todas las tareas cuyo miembro sea alguno de los del array que se recibe y las deja sin miembro asignado
+ ** 
+ * @param: id proyecto y array de ids de miembros
+ */
+ const desasignarTarea = async (req, res = response) => {
+  try {
+    const { id_proyecto, miembros } = req.body;
+
+    Tarea.updateMany(
+      { id_proyecto, miembro: { $in: miembros } }, 
+      { miembro: null },
+      function (err, docs) {
+        if (err) {
+          console.log(err);
+          res.status(500).json({
+            ok: false,
+            msg: "La peticion de actualizar tarea fallo",
+          });
+        } else {
+          console.log("Actualizada la tarea", docs);
+          res.json({
+            ok: true,
+            data: docs,
+          });
+        }
+      }
+    );
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "La peticion de desasignar miembros de tarea fallo",
+    });
+  }
+};
+
+/**
  *
  * @description: Busca las tareas activas de un proyecto
  *
@@ -101,7 +139,7 @@ const getTareasProyecto = async (req, res = response) => {
 /**
  *
  * @description: Busca las tareas activas de un proyecto y las agrupa por miembro, buscando el numero total,
- * los tiempo de cada una y el nombre del miembro
+ * los tiempos de cada una y el nombre del miembro
  *
  * @param: id del proyecto
  */
@@ -146,26 +184,8 @@ const getTareasPorMiembro = async (req, res = response) => {
     });
   }
 
-  /*
-  db.tareas.aggregate( [
-    {
-      $group: {
-        _id: "$miembro", 
-        tareas: { $sum: 1 }, 
-        tiempo: { $push: "$cronometro" }
-      }
-    }, 
-    {
-      $lookup: {
-      from: 'usuarios',
-      localField: '_id',
-      foreignField: '_id',
-      as: 'miembro'
-    }
-    }
-  ])
-  */
 };
+
 /**
  *
  * @description: Busca las tareas activas de un usuario dentro de un proyecto
@@ -198,6 +218,7 @@ const getTareasUsuarioProyecto = async (req, res = response) => {
     });
   }
 };
+
 /**
  *
  * @params id_tarea, id_lista
@@ -259,6 +280,7 @@ const getTarea = async (req, res = response) => {
 module.exports = {
   createTarea,
   updateTarea,
+  desasignarTarea,
   getTareasProyecto,
   getTareasPorMiembro,
   getTarea,

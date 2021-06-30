@@ -123,6 +123,7 @@ const getProyectosUsuario = async (req, res = response) => {
       foreignField: 'id_proyecto',
       as: 'tareas'
     })
+    .sort({ updatedAt: -1 })
     .project({
       _id: 1,
       nombre: 1,
@@ -130,7 +131,6 @@ const getProyectosUsuario = async (req, res = response) => {
       tareas: { $size: "$tareas" },
       archivado: 1
     })
-    .sort({ updatedAt: -1 })
     .exec();
     
     console.log(proyectos);
