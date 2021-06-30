@@ -273,7 +273,7 @@ const recuperarContrasena = async (req, res = response) => {
         to: usuarioDB.email,
         subject: "Recuperación de contraña Workzone",
         html: `<h3>Estimado usuario,</h3><p style="font-size: 16px;">Su contraseña es: <strong>${contraseProvisional}</strong> . 
-    Por favor ingrese a su cuenta con esta contraseña provicional y cambie la contraseña</p>`,
+    Por favor ingrese a su cuenta con esta contraseña provisional y cambie la contraseña</p>`,
       })
       .then((res) => console.log("successfully sent that mail"))
       .catch((err) => console.log(err));
@@ -303,6 +303,43 @@ const recuperarContrasena = async (req, res = response) => {
   }
 };
 
+/**
+ * @description: cambia la contraseña
+ * @param: id y nueva contrasena
+ */
+const resetearContrasena = async (req, res = response) => {
+  try {
+    const { id, contrasena } = req.body;
+    console.log(req.body);
+    const usuarioDB = await Usuario.findById(id);
+    const salt = bcrypt.genSaltSync();
+    usuarioDB.contrasena = bcrypt.hashSync(contrasena, salt);
+
+    usuario.findByIdAndUpdate(
+      usuarioDB._id,
+      { ...usuarioDB },
+      function (err, docs) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log("Actualizada la contrasena del usuario", docs);
+        }
+      }
+    );
+
+    res.json({
+      ok: true,
+      data: usuarioDB,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "La peticion de resear contraseña fallo",
+    });
+  }
+};
+
 module.exports = {
   createUsuario,
   login,
@@ -312,6 +349,7 @@ module.exports = {
   getUsuarios,
   recuperarContrasena,
   getUsuario,
+  resetearContrasena,
 };
 
 // const getUsuarioByEmail = async (email) => {
