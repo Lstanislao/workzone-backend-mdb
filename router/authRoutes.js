@@ -12,6 +12,7 @@ const {
   getUsuarios,
   recuperarContrasena,
   getUsuario,
+  resetearContrasena,
 } = require("../controllers/authController");
 const { validarCampos } = require("../middlewares/validarCampos");
 const { validarJWT } = require("../middlewares/validarJwt");
@@ -35,6 +36,7 @@ router.post("/update", updateUsuario);
 
 //Recuperar contrasena
 router.post("/resetPassword", recuperarContrasena);
+router.post("/updatePassword", resetearContrasena);
 
 //get all usuarios
 router.get("/users", getUsuarios);
